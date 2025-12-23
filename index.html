@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TOPAI</title>
+
+<style>
+body {
+  margin: 0;
+  height: 100vh;
+  background: linear-gradient(135deg, #7f00ff, #ff7a00);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-family: Arial, sans-serif;
+}
+
+.app {
+  width: 100%;
+  max-width: 420px;
+  height: 100vh;
+  background: #0b0b16;
+  display: flex;
+  flex-direction: column;
+}
+
+.header {
+  padding: 15px;
+  text-align: center;
+  font-size: 22px;
+  font-weight: bold;
+  color: white;
+  background: linear-gradient(90deg, #7f00ff, #ff7a00);
+  box-shadow: 0 0 15px #ff7a00;
+}
+
+.chat {
+  flex: 1;
+  padding: 10px;
+  overflow-y: auto;
+}
+
+.msg {
+  max-width: 80%;
+  padding: 12px;
+  border-radius: 15px;
+  margin-bottom: 10px;
+  animation: pop 0.3s ease;
+}
+
+.user {
+  background: #ff7a00;
+  color: black;
+  margin-left: auto;
+}
+
+.ai {
+  background: #7f00ff;
+  color: white;
+}
+
+@keyframes pop {
+  from { opacity: 0; transform: scale(0.95); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+.input-box {
+  display: flex;
+  padding: 10px;
+  gap: 8px;
+  background: #111;
+}
+
+input {
+  flex: 1;
+  padding: 12px;
+  border-radius: 20px;
+  border: none;
+  outline: none;
+}
+
+button {
+  padding: 0 18px;
+  border-radius: 20px;
+  border: none;
+  background: linear-gradient(135deg, #7f00ff, #ff7a00);
+  color: white;
+  font-weight: bold;
+}
+
+.clear {
+  text-align: right;
+  color: #ff7a00;
+  font-size: 12px;
+  padding: 6px 10px;
+}
+</style>
+</head>
+
+<body>
+
+<div class="app">
+  <div class="header">⚡ TOPAI</div>
+  <div class="clear" onclick="clearChat()">Clear Chat</div>
+  <div id="chat" class="chat"></div>
+
+  <div class="input-box">
+    <input id="input" placeholder="Ask TOPAI..." />
+    <button onclick="send()">➤</button>
+  </div>
+</div>
+
+<script>
+const chat = document.getElementById("chat");
+const input = document.getElementById("input");
+
+function addMsg(text, cls) {
+  const div = document.createElement("div");
+  div.className = "msg " + cls;
+  div.textContent = text;
+  chat.appendChild(div);
+  chat.scrollTop = chat.scrollHeight;
+}
+
+async function send() {
+  const text = input.value.trim();
+  if (!text) return;
+
+  addMsg(text, "user");
+  input.value = "";
+
+  addMsg("TOPAI is thinking...", "ai");
+
+  const res = await fetch("https://YOUR-BACKEND-URL/api/chat", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ message: text })
+  });
+
+  const data = await res.json();
+  chat.lastChild.textContent =
+    data.choices?.[0]?.message?.content || "Error 😕";
+}
+
+function clearChat() {
+  chat.innerHTML = "";
+}
+</script>
+
+</body>
+</html>
